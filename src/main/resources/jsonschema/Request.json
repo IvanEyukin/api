@@ -1,0 +1,32 @@
+{
+    "schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "status": {
+            "type": "string",
+            "enum": [
+                "OK",
+                "ERROR"
+            ]
+        },
+        "requestGuid": {
+            "type": "string"
+        },
+        "errorCode": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "errorMessage": {
+            "type": [
+                "null",
+                "string"
+            ]
+        }
+    },
+    "required": [
+        "status",
+        "requestGuid"
+    ]
+}
