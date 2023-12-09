@@ -27,6 +27,11 @@ public class Task {
     String content;
 
     /* 
+     * Статус
+    */
+    String status;
+
+    /* 
      * Дата создания
     */
     LocalDateTime creationDate;

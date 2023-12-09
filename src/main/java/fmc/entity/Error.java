@@ -1,4 +1,4 @@
-package fmc.dto;
+package fmc.entity;
 
 import java.util.Map;
 

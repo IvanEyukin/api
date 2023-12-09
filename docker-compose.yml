@@ -1,0 +1,18 @@
+version: "3.7"
+
+volumes:
+    sqlite: {}
+
+networks:
+  fmc-net:
+
+services:
+  api:
+    container_name: api
+    image: ivaneyukin/fmc/api:1.0.1
+    volumes:
+      - sqlite:/opt/api/database
+    networks:
+      - fmc-net
+    ports:
+      - 8080:8080

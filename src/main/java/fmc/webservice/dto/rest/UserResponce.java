@@ -1,7 +1,7 @@
 package fmc.webservice.dto.rest;
 
-import javax.validation.constraints.NotBlank;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
@@ -51,5 +51,10 @@ public class UserResponce {
          * Пароль пользователя
          */
         Boolean password;
+
+        /*
+         * Роль пользователя
+         */
+        String role;
     }
 }

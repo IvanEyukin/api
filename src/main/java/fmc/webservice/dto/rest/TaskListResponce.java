@@ -1,6 +1,6 @@
 package fmc.webservice.dto.rest;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -57,6 +57,11 @@ public class TaskListResponce {
          * Контент
          */
         String content;
+
+        /*
+         * Статус
+         */
+        String status;
 
         /*
          * Дата создания

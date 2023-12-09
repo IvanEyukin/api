@@ -1,8 +1,10 @@
 package fmc.database.client;
 
+import fmc.config.Config;
 import fmc.database.request.TaskRequest;
 import fmc.database.request.UserRequest;
 import fmc.dto.Task;
+import fmc.dto.User;
 import fmc.utils.Utils;
 
 import java.sql.Connection;
@@ -11,7 +13,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,6 @@ import org.springframework.stereotype.Component;
 public class Client {
 
     private Utils utils = new Utils();
-    private String dbPath = "db/database.db"; 
     private final static String dbDriver = "jdbc:sqlite:";
 
     private String checkNull(String value) {
@@ -33,7 +33,7 @@ public class Client {
     }
 
     private Connection connect() throws SQLException {
-        Connection conn = DriverManager.getConnection(dbDriver.concat(dbPath));
+        Connection conn = DriverManager.getConnection(dbDriver.concat(Config.dbPath));
         return conn;
     }
 
@@ -61,34 +61,38 @@ public class Client {
         return result;
     }
     
-    public void addUser(String login, String password, LocalDateTime createDate) throws SQLException {
+    public void addUser(User user) throws SQLException {
         Connection conn = connect();
         PreparedStatement pstmt = conn.prepareStatement(UserRequest.INSERT);
-        pstmt.setString(1, login);
-        pstmt.setString(2, password);
-        pstmt.setLong(3, utils.converLocalDateTimeToLong(createDate));
+        pstmt.setString(1, checkNull(user.getName()));
+        pstmt.setString(2, user.getLogin());
+        pstmt.setString(3, user.getPassword());
+        pstmt.setLong(4, utils.converLocalDateTimeToLong(user.getCreationDate()));
+        pstmt.setString(5, checkNull(user.getRole()));
         pstmt.executeUpdate();
         conn.close();
     }
 
-    public void updateUser(String login, String password, String role) throws SQLException {
+    public void updateUser(User user) throws SQLException {
         Connection conn = connect();
         PreparedStatement pstmt = conn.prepareStatement(UserRequest.UPDATE);
-        pstmt.setString(1, password);
-        pstmt.setString(2, checkNull(role));
-        pstmt.setString(3, login);
+        pstmt.setString(1, checkNull(user.getName()));
+        pstmt.setString(2, user.getPassword());
+        pstmt.setString(3, checkNull(user.getRole()));
+        pstmt.setString(4, user.getLogin());
         pstmt.executeUpdate();
         conn.close();
     }
 
-    public int addTask(String creator, String title, String content, LocalDateTime createDate) throws SQLException {
+    public int addTask(Task task) throws SQLException {
         Connection conn = connect();
         conn.setAutoCommit(false);
         PreparedStatement pstmt = conn.prepareStatement(TaskRequest.INSERT);
-        pstmt.setString(1, creator);
-        pstmt.setString(2, title);
-        pstmt.setString(3, checkNull(content));
-        pstmt.setLong(4, utils.converLocalDateTimeToLong(createDate));
+        pstmt.setString(1, task.getCreator());
+        pstmt.setString(2, task.getTitle());
+        pstmt.setString(3, checkNull(task.getContent()));
+        pstmt.setString(4, task.getStatus());
+        pstmt.setLong(5, utils.converLocalDateTimeToLong(task.getCreationDate()));
         pstmt.executeUpdate();
 
         Statement stmt = conn.createStatement();
@@ -99,12 +103,13 @@ public class Client {
         return id;
     }
 
-    public void updateTask(int id, String title, String content) throws SQLException {
+    public void updateTask(Task task) throws SQLException {
         Connection conn = connect();
         PreparedStatement pstmt = conn.prepareStatement(TaskRequest.UPDATE);
-        pstmt.setString(1, title);
-        pstmt.setString(2, checkNull(content));
-        pstmt.setInt(3, id);
+        pstmt.setString(1, task.getTitle());
+        pstmt.setString(2, checkNull(task.getContent()));
+        pstmt.setString(3, task.getStatus());
+        pstmt.setInt(4, task.getId());
         pstmt.executeUpdate();
         conn.close();
     }
@@ -120,6 +125,7 @@ public class Client {
             task.setCreator(rs.getString("creator"));
             task.setTitle(rs.getString("title"));
             task.setContent(rs.getString("content"));
+            task.setStatus(rs.getString("status"));
             task.setCreationDate(utils.converIntToLocalDateTime(rs.getInt("creationDate")));
             taskList.add(task);
         }

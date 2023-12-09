@@ -3,16 +3,17 @@ package fmc.database.request;
 public class TaskRequest {
     public final static String INSERT = """
             INSERT INTO Task
-                (creator, title, content, creationDate)
+                (creator, title, content, status, creationDate)
             VALUES
-                (?,?,?,?)
+                (?,?,?,?,?)
             """;
     public final static String UPDATE = """
             UPDATE 
                 Task
             SET
                 title = ?,
-                content = ?
+                content = ?,
+                status = ?
             WHERE
                 id = ?
             """;
@@ -22,6 +23,7 @@ public class TaskRequest {
                 creator         AS creator,
                 title           AS title,
                 content         AS content,
+                status          AS status,
                 creationDate    AS creationDate
             FROM
                 Task

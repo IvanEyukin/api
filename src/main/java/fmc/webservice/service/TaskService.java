@@ -1,14 +1,14 @@
 package fmc.webservice.service;
 
 import fmc.database.client.Client;
-import fmc.dto.Error;
 import fmc.dto.Task;
-import fmc.webservice.dto.rest.Status;
+import fmc.entity.Error.ErrorCode;
+import fmc.entity.LogMessage;
+import fmc.mapper.Mapper;
 import fmc.webservice.dto.rest.StatusResponce;
 import fmc.webservice.dto.rest.TaskListResponce;
 import fmc.webservice.dto.rest.TaskRequest;
 import fmc.webservice.dto.rest.TaskResponce;
-import fmc.webservice.dto.rest.TaskListResponce.TaskListContent;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,78 +25,69 @@ public class TaskService {
 
     @Autowired
     private Client client = new Client();
+    private Mapper mapper = new Mapper();
 
     public TaskResponce create(String messageId, TaskRequest taskRequest) {
         TaskResponce responce = new TaskResponce();
         TaskResponce.TaskContent content = responce.new TaskContent();
+        log.info(LogMessage.IN, messageId, taskRequest);
         try {
-            int taskId = client.addTask(taskRequest.getCreator(), taskRequest.getTitle(), taskRequest.getContent(), taskRequest.getCreationDate());
+            int taskId = client.addTask(mapper.mappingTask(taskRequest));
             content.setId(taskId);
-            responce.setStatus(Status.OK);
+            responce = mapper.mappingSuccessTaskResponce(messageId);
+            responce.setContent(content);
         } catch (Exception e) {
             log.error(messageId, e);
-            responce.setStatus(Status.ERROR);
-            responce.setErrorCode(Error.ErrorCode.Exception.name());
-            responce.setErrorMessage(Error.ErrorMessage.Exception.name());
+            responce = mapper.mappingErrorTaskResponce(messageId, ErrorCode.Exception);
         }
-        responce.setRequestGuid(messageId);
-        responce.setContent(content);
+        log.info(LogMessage.OUT, messageId, responce);
         return responce;
     }
 
     public TaskListResponce getTaskList(String messageId) {
         TaskListResponce responce = new TaskListResponce();
         List<TaskListResponce.TaskListContent> contentList = new ArrayList<TaskListResponce.TaskListContent>();
-        responce.setRequestGuid(messageId);
+        log.info(LogMessage.IN, messageId);
         try {
             List<Task> taskList = client.getTaskList();
             for (Task task : taskList) {
-               TaskListContent content = responce.new TaskListContent();
-               content.setId(task.getId());
-               content.setCreator(task.getCreator());
-               content.setTitle(task.getTitle());
-               content.setContent(task.getContent());
-               content.setCreationDate(task.getCreationDate());
-               contentList.add(content);
+               contentList.add(mapper.mappingTaskListResponceContent(task));
             }
-            responce.setStatus(Status.OK);
+            responce = mapper.mappingSuccessTaskListResponce(messageId);
             responce.setContent(contentList);
         } catch (Exception e) {
             log.error(messageId, e);
-            responce.setStatus(Status.ERROR);
-            responce.setErrorCode("100");
-            responce.setErrorMessage("Внутренняя ошибка");
+            responce = mapper.mappingErrorTaskListResponce(messageId, ErrorCode.Exception);
         }
+        log.info(LogMessage.OUT, messageId, responce);
         return responce;
     }
 
     public StatusResponce updateTask(String messageId, int taskId, TaskRequest taskRequest) {
         StatusResponce responce = new StatusResponce();
-        responce.setRequestGuid(messageId);
+        log.info(LogMessage.IN, messageId, taskRequest);
         try {
-            client.updateTask(taskId, taskRequest.getTitle(), taskRequest.getContent());
-            responce.setStatus(Status.OK);
+            client.updateTask(mapper.mappingTask(taskRequest));
+            responce = mapper.mappingSuccessResponce(messageId);
         } catch (Exception e) {
             log.error(messageId, e);
-            responce.setStatus(Status.ERROR);
-            responce.setErrorCode("100");
-            responce.setErrorMessage("Внутренняя ошибка");
+            responce = mapper.mappingErrorResponce(messageId, ErrorCode.Exception);
         }
+        log.info(LogMessage.OUT, messageId, responce);
         return responce;
     }
 
     public StatusResponce deleteTask(String messageId, int taskId) {
         StatusResponce responce = new StatusResponce();
-        responce.setRequestGuid(messageId);
+        log.info(LogMessage.IN, messageId, taskId);
         try {
             client.deleteTask(taskId);
-            responce.setStatus(Status.OK);
+            responce = mapper.mappingSuccessResponce(messageId);
         } catch (Exception e) {
             log.error(messageId, e);
-            responce.setStatus(Status.ERROR);
-            responce.setErrorCode("100");
-            responce.setErrorMessage("Внутренняя ошибка");
+            responce = mapper.mappingErrorResponce(messageId, ErrorCode.Exception);
         }
+        log.info(LogMessage.OUT, messageId, responce);
         return responce;
     }
 }

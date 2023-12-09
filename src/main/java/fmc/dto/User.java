@@ -22,6 +22,11 @@ public class User {
     String password;
 
     /* 
+     * Пароль пользователя
+    */
+    String role;
+
+    /* 
      * Дата регистрации
     */
     LocalDateTime creationDate;
