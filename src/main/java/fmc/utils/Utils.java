@@ -16,7 +16,7 @@ public class Utils {
     }    
 
     public long converLocalDateTimeToLong(LocalDateTime localDateTime) {
-        return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return localDateTime.atZone(ZoneId.systemDefault()).toInstant().getEpochSecond();
     }
 
     public LocalDateTime converIntToLocalDateTime(int localDateTime) {
