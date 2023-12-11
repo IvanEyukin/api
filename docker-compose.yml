@@ -9,10 +9,12 @@ networks:
 services:
   api:
     container_name: api
-    image: ivaneyukin/fmc/api:1.0.1
+    image: ivaneyukin/api:1.0.1
     volumes:
       - sqlite:/opt/api/database
     networks:
       - fmc-net
     ports:
       - 8080:8080
+    restart: 
+      always
